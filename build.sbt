@@ -15,9 +15,7 @@ resolvers ++= Seq(
 resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
-  "org.scala-lang"   %  "scala-library"           % "2.11.0",
-  "org.apache.spark" %% "spark-core"              % "1.6.0",
-  "org.apache.spark" %% "spark-sql"               % "1.6.0",
-  "org.apache.spark" %% "spark-streaming"         % "1.5.2",
-  "org.apache.spark" %% "spark-streaming-twitter" % "1.6.0"
+  "org.apache.spark" %% "spark-sql"               % "2.0.1",
+  "org.apache.spark" %% "spark-streaming"         % "2.0.1",
+  "org.apache.bahir" %% "spark-streaming-twitter" % "2.0.1"
 )
