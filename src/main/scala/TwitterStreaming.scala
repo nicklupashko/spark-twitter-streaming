@@ -17,32 +17,25 @@ object TwitterStreaming {
 
     val slideInterval = Seconds(20)
     val windowLength  = Minutes(2)
+    val hashTag       = "#starwars"
+    val wordRegex     = "[^\\W\\d_]+".r
 
-    val conf = new SparkConf().setMaster("local[*]").setAppName("spark-twitter-streaming")
-    val sc = new SparkContext(conf)
-    val ssc = new StreamingContext(sc, slideInterval)
-    val twitterStream = TwitterUtils.createStream(ssc, None)
+    val conf = new SparkConf().setAppName("spark-twitter-streaming").setMaster("local[*]")
+    val sc   = new SparkContext(conf)
+    val ssc  = new StreamingContext(sc, slideInterval)
+    val twitterStream = TwitterUtils.createStream(ssc, None, Array(hashTag))
 
-    // Split the twitterStream on space and extract hashtags
-    val hashTags = twitterStream.flatMap(status => status.getText.split(" ").filter(_.startsWith("#")))
+    twitterStream.map(_.getText.toLowerCase)
+      .window(windowLength, slideInterval)
+      .foreachRDD(rdd => {
+        println(s"Count: ${rdd.count}")
+        rdd.flatMap(wordRegex.findAllIn(_).toList)
+          .map((_, 1)).reduceByKey(_ + _)
+          .sortBy(_._2, false)
+          .take(10).foreach(println)
+      })
 
-    // Get the top hashtags over the previous 60 sec window
-    val topCounts60 = hashTags.map((_, 1)).reduceByKeyAndWindow(_ + _, windowLength)
-      .map { case (topic, count) => (count, topic) }
-      .transform(_.sortByKey(false))
-
-    // print tweets in the currect DStream
-    twitterStream.print()
-
-    // Print popular hashtags
-    topCounts60.foreachRDD(rdd => {
-      val topList = rdd.take(10)
-      println(s"\nPopular topics in last 60 seconds (${rdd.count()} total):")
-      topList.foreach { case (count, tag) => println(s"${tag} (${count} tweets)") }
-    })
-
-    ssc.start()
-    ssc.awaitTerminationOrTimeout(Minutes(1).milliseconds)
+    ssc.start
+    ssc.awaitTermination
   }
-
 }
