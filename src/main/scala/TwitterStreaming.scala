@@ -5,10 +5,10 @@ import org.apache.spark.streaming.{Minutes, Seconds, StreamingContext}
 object TwitterStreaming {
   def main(args: Array[String]): Unit = {
 
-    val apiKey = "8dD3v2yFgEdfIgzYSPKlhL9vW"
-    val apiSecret = "quURcrkUNOG6O7xnUlbPzQAfw8gxncYSoIT26v4hy0zhQG7mqQ"
-    val accessToken = "317037418-FmxESuhNiEGlG3sUDSim0DJGl73RcOCfaZfGCIbl"
-    val accessTokenSecret = "faAl81LdjN58b3cNHIUMCFiKzCMbKpR69SFzzmVydMfDL"
+    val apiKey = "*******"
+    val apiSecret = "*******"
+    val accessToken = "*******"
+    val accessTokenSecret = "*******"
 
     System.setProperty("twitter4j.oauth.consumerKey", apiKey)
     System.setProperty("twitter4j.oauth.consumerSecret", apiSecret)
