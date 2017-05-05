@@ -1,6 +1,6 @@
-import org.apache.spark.streaming.twitter.TwitterUtils
 import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.streaming.{Minutes, Seconds, StreamingContext}
+import org.apache.spark.streaming._
+import org.apache.spark.streaming.twitter.TwitterUtils
 
 object TwitterStreaming {
   def main(args: Array[String]): Unit = {
@@ -20,7 +20,7 @@ object TwitterStreaming {
     val hashTag       = "#starwars"
     val wordRegex     = "[^\\W\\d_]+".r
 
-    val conf = new SparkConf().setAppName("spark-twitter-streaming").setMaster("local[*]")
+    val conf = new SparkConf().setAppName("TwitterStreaming").setMaster("local[*]")
     val sc   = new SparkContext(conf)
     val ssc  = new StreamingContext(sc, slideInterval)
     val twitterStream = TwitterUtils.createStream(ssc, None, Array(hashTag))
@@ -28,7 +28,7 @@ object TwitterStreaming {
     twitterStream.map(_.getText.toLowerCase)
       .window(windowLength, slideInterval)
       .foreachRDD(rdd => {
-        println(s"Count: ${rdd.count}")
+        println("Count: " + rdd.count)
         rdd.flatMap(wordRegex.findAllIn(_).toList)
           .map((_, 1)).reduceByKey(_ + _)
           .sortBy(_._2, false)
