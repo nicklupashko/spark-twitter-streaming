@@ -1,19 +1,16 @@
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.streaming._
 import org.apache.spark.streaming.twitter.TwitterUtils
+import com.typesafe.config.ConfigFactory
 
 object TwitterStreaming {
   def main(args: Array[String]): Unit = {
 
-    val apiKey = "*******"
-    val apiSecret = "*******"
-    val accessToken = "*******"
-    val accessTokenSecret = "*******"
-
-    System.setProperty("twitter4j.oauth.consumerKey", apiKey)
-    System.setProperty("twitter4j.oauth.consumerSecret", apiSecret)
-    System.setProperty("twitter4j.oauth.accessToken", accessToken)
-    System.setProperty("twitter4j.oauth.accessTokenSecret", accessTokenSecret)
+    val config = ConfigFactory.load().getConfig("twitter")
+    System.setProperty("twitter4j.oauth.consumerKey", config.getString("apiKey"))
+    System.setProperty("twitter4j.oauth.consumerSecret", config.getString("apiSecret"))
+    System.setProperty("twitter4j.oauth.accessToken", config.getString("accessToken"))
+    System.setProperty("twitter4j.oauth.accessTokenSecret", config.getString("accessTokenSecret"))
 
     val slideInterval = Seconds(20)
     val windowLength  = Minutes(2)
