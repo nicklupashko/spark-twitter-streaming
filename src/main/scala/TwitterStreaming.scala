@@ -27,8 +27,8 @@ object TwitterStreaming {
       .foreachRDD(rdd => {
         println("Count: " + rdd.count)
         rdd.flatMap(wordRegex.findAllIn(_).toList)
-          .map((_, 1)).reduceByKey(_ + _)
-          .sortBy(_._2, false)
+          .map(word => (word, 1)).reduceByKey(_ + _)
+          .sortBy({ case (_, count) => count }, ascending = false)
           .take(10).foreach(println)
       })
 
